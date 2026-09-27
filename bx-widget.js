@@ -161,7 +161,13 @@ function start(DATA_BASE) {
       input = document.getElementById("bx-q"),
       locateBtn = document.getElementById("bx-locate"),
       resultEl = document.getElementById("bx-result"),
-      marker = null;
+      resultLayer = L.layerGroup().addTo(map),   // every search pin / polling pin lives here
+      gen = 0;                                   // bumped on each new search or tab switch
+
+  // Clear everything a previous search put on the map.
+  function clearResults() { resultLayer.clearLayers(); map.closePopup(); }
+  // Start a new search: invalidates any older in-flight one. Returns isCurrent().
+  function begin() { var mine = ++gen; return function () { return mine === gen; }; }
 
   // Ray-casting point-in-polygon for GeoJSON Polygon / MultiPolygon ([lng, lat]).
   function inRing(pt, ring) {
@@ -197,8 +203,8 @@ function start(DATA_BASE) {
       for (var i = 0; i < precincts.features.length; i++) {
         if (inFeature(pt, precincts.features[i])) { pct = precincts.features[i].properties.p; break; }
       }
-      if (marker) map.removeLayer(marker);
-      marker = L.circleMarker([lat, lng], { radius: 9, color: "#fff", weight: 3, fillColor: RED, fillOpacity: 1 }).addTo(map);
+      clearResults();
+      var marker = L.circleMarker([lat, lng], { radius: 9, color: "#fff", weight: 3, fillColor: RED, fillOpacity: 1 }).addTo(resultLayer);
       var msg = inCounty
         ? '<strong style="color:#ec1f27">&#10003; In Bexar County</strong>' + (pct != null ? ' <span style="color:#1a1a1a">&middot; Precinct ' + pct + "</span>" : "")
         : '<strong style="color:#1a1a1a">Outside Bexar County</strong>';
@@ -254,12 +260,14 @@ function start(DATA_BASE) {
       Array.prototype.forEach.call(suggEl.children, function (li, k) { li.classList.toggle("active", k === i); });
     }
     function locate(text, magicKey) {
+      var isCurrent = begin();
       setResult("Searching&hellip;");
       geocode(text, magicKey).then(function (c) {
+        if (!isCurrent()) return;
         if (!c) { setResult("Couldn't find that address. Try adding the street name or ZIP code.", true); return; }
         input.value = titleCase(c.address);
         showPoint(c.location.y, c.location.x, titleCase(c.address));
-      }).catch(function () { setResult("Address lookup failed. Please try again.", true); });
+      }).catch(function () { if (isCurrent()) setResult("Address lookup failed. Please try again.", true); });
     }
     function choose(i) {
       var sg = suggestions[i]; if (!sg) return;
@@ -302,11 +310,12 @@ function start(DATA_BASE) {
 
     locateBtn.addEventListener("click", function () {
       if (!navigator.geolocation) { setResult("Your browser doesn't support location.", true); return; }
+      var isCurrent = begin();
       setResult("Getting your location&hellip;");
       navigator.geolocation.getCurrentPosition(
-        function (pos) { showPoint(pos.coords.latitude, pos.coords.longitude, "Your current location"); },
+        function (pos) { if (isCurrent()) showPoint(pos.coords.latitude, pos.coords.longitude, "Your current location"); },
         function (err) {
-          setResult(err.code === 1 ? "Location access was denied. You can type an address instead." : "Couldn't get your location.", true);
+          if (isCurrent()) setResult(err.code === 1 ? "Location access was denied. You can type an address instead." : "Couldn't get your location.", true);
         },
         { enableHighAccuracy: true, timeout: 10000 }
       );
@@ -328,6 +337,8 @@ function start(DATA_BASE) {
         if (tabForms[k]) tabForms[k].style.display = (k === m) ? (k === "voter" ? "block" : "flex") : "none";
       });
       Array.prototype.forEach.call(tabBtns, function (b) { b.classList.toggle("active", b.getAttribute("data-tab") === m); });
+      begin();              // drop any search still in flight
+      clearResults();
       setResult("");
       if (focus && tabInputs[m]) tabInputs[m].focus();
     }
@@ -427,11 +438,13 @@ function start(DATA_BASE) {
         setResult(info + '<div style="font-size:13px;color:#666666">This voter&rsquo;s address is confidential in the county&rsquo;s public records, so it can&rsquo;t be shown on the map.</div>');
         return;
       }
+      var isCurrent = begin();
       setResult("Locating&hellip;");
       geocode(v[3], null).then(function (c) {
+        if (!isCurrent()) return;
         if (c) showPoint(c.location.y, c.location.x, titleCase(c.address), info);
         else setResult(info + '<div style="font-size:13px;color:#666666">' + titleCase(v[3]) + " (couldn&rsquo;t place on the map)</div>");
-      }).catch(function () { setResult(info); });
+      }).catch(function () { if (isCurrent()) setResult(info); });
     }
 
     if (vform) {
@@ -462,7 +475,7 @@ function start(DATA_BASE) {
     // Bexar County uses countywide vote centers: any registered Bexar
     // County voter may vote at ANY location. We show the closest ones.
     if (pform) {
-    var pollData = null, pollLoading = null, pDebounce = null, pSuggs = [], pActive = -1, pollMarkers = [];
+    var pollData = null, pollLoading = null, pDebounce = null, pSuggs = [], pActive = -1;
 
     function loadPolling() {
       if (pollLoading) return pollLoading;
@@ -507,23 +520,20 @@ function start(DATA_BASE) {
         (s.note ? "<br><em>" + s.note + "</em>" : "") + "</div>" +
         '<a class="bx-cta" href="' + dirLink(fromLat, fromLng, s) + '" target="_blank" rel="noopener">Directions &rarr;</a></div>';
     }
-    function showPolling(lat, lng, label) {
+    function showPolling(lat, lng, label, isCurrent) {
       loadPolling().then(function (d) {
-        if (!d) return;
+        if (!d || (isCurrent && !isCurrent())) return;
         var ev = nearest(lat, lng, "ev"), ed = nearest(lat, lng, "ed");
-        pollMarkers.forEach(function (m) { map.removeLayer(m); });
-        pollMarkers = [];
-        if (marker) map.removeLayer(marker);
-        marker = L.circleMarker([lat, lng], { radius: 9, color: "#fff", weight: 3, fillColor: RED, fillOpacity: 1 })
-          .addTo(map).bindPopup(label || "You are here");
+        clearResults();
+        L.circleMarker([lat, lng], { radius: 9, color: "#fff", weight: 3, fillColor: RED, fillOpacity: 1 })
+          .addTo(resultLayer).bindPopup(label || "You are here");
         var pts = [[lat, lng]];
         [{ hit: ev, t: "Early voting" }, { hit: ed, t: "Election day" }].forEach(function (x) {
           if (!x.hit) return;
           var s = x.hit.site;
           var m = L.circleMarker([s.lat, s.lng], { radius: 8, color: "#fff", weight: 3, fillColor: INK, fillOpacity: 1 })
-            .addTo(map).bindPopup("<strong>" + s.n + "</strong><br>" + x.t + " &middot; " + x.hit.mi.toFixed(1) + " mi<br>" + s.a +
+            .addTo(resultLayer).bindPopup("<strong>" + s.n + "</strong><br>" + x.t + " &middot; " + x.hit.mi.toFixed(1) + " mi<br>" + s.a +
               '<br><a class="bx-cta" href="' + dirLink(lat, lng, s) + '" target="_blank" rel="noopener">Directions &rarr;</a>');
-          pollMarkers.push(m);
           pts.push([s.lat, s.lng]);
         });
         var html = '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
@@ -551,13 +561,15 @@ function start(DATA_BASE) {
       psuggEl.hidden = false;
     }
     function pLocate(text, magicKey) {
+      var isCurrent = begin();
       setResult("Searching&hellip;");
       loadPolling();                                  // start the data fetch in parallel
       geocode(text, magicKey).then(function (c) {
+        if (!isCurrent()) return;
         if (!c) { setResult("Couldn't find that address. Try adding the street name or ZIP code.", true); return; }
         pinput.value = titleCase(c.address);
-        showPolling(c.location.y, c.location.x, titleCase(c.address));
-      }).catch(function () { setResult("Address lookup failed. Please try again.", true); });
+        showPolling(c.location.y, c.location.x, titleCase(c.address), isCurrent);
+      }).catch(function () { if (isCurrent()) setResult("Address lookup failed. Please try again.", true); });
     }
     function pChoose(i) {
       var sg = pSuggs[i]; if (!sg) return;
@@ -594,12 +606,13 @@ function start(DATA_BASE) {
     });
     document.getElementById("bx-plocate").addEventListener("click", function () {
       if (!navigator.geolocation) { setResult("Your browser doesn't support location.", true); return; }
+      var isCurrent = begin();
       setResult("Getting your location&hellip;");
       loadPolling();
       navigator.geolocation.getCurrentPosition(
-        function (pos) { showPolling(pos.coords.latitude, pos.coords.longitude, "Your current location"); },
+        function (pos) { if (isCurrent()) showPolling(pos.coords.latitude, pos.coords.longitude, "Your current location", isCurrent); },
         function (err) {
-          setResult(err.code === 1 ? "Location access was denied. You can type an address instead." : "Couldn't get your location.", true);
+          if (isCurrent()) setResult(err.code === 1 ? "Location access was denied. You can type an address instead." : "Couldn't get your location.", true);
         },
         { enableHighAccuracy: true, timeout: 10000 }
       );
