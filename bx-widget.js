@@ -32,7 +32,7 @@
 
   // ---- styles + markup -----------------------------------------
   var style = document.createElement("style");
-  style.textContent = '#bx-wrap { font-family: inherit; color: #0e2952; }\n  #bx-map .leaflet-container { font: 13px/1.4 "Prompt", Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }\n  #bx-wrap .bx-input { width:100%; box-sizing:border-box; padding:12px 16px; border:2px solid #0e2952; border-radius:999px; font-size:16px; font-family:inherit; color:#0e2952; background:#fff; outline:none; }\n  #bx-wrap .bx-input:focus { box-shadow:0 0 0 3px rgba(250,114,30,.35); }\n  #bx-wrap .bx-input::placeholder { color:#6b7a90; }\n  #bx-wrap .bx-btn { padding:12px 22px; border-radius:999px; font-size:15px; font-weight:600; font-family:inherit; cursor:pointer; letter-spacing:.02em; white-space:nowrap; }\n  #bx-wrap .bx-btn-primary { background:#fa721e; color:#fff; border:2px solid #fff; box-shadow:0 0 0 2px #fa721e; }\n  #bx-wrap .bx-btn-primary:hover { background:#e8630f; }\n  #bx-wrap .bx-btn-secondary { background:#fff; color:#0e2952; border:2px solid #0e2952; }\n  #bx-wrap .bx-btn-secondary:hover { background:#f8f4ec; }\n  #bx-wrap .bx-sugg { position:absolute; left:12px; right:12px; top:calc(100% + 4px); z-index:2000; background:#fff; border:2px solid #0e2952; border-radius:14px; box-shadow:0 6px 18px rgba(14,41,82,.18); margin:0; padding:6px 0; list-style:none; max-height:280px; overflow-y:auto; }\n  #bx-wrap .bx-sugg li { padding:9px 16px; cursor:pointer; font-size:15px; line-height:1.3; color:#0e2952; }\n  #bx-wrap .bx-sugg li small { display:block; color:#5b6b82; font-size:12.5px; }\n  #bx-wrap .bx-sugg li:hover, #bx-wrap .bx-sugg li.active { background:#f8f4ec; }\n  #bx-map .precinct-tip { background:#0e2952; color:#fff; border:0; border-radius:8px; padding:5px 10px; font-weight:600; box-shadow:0 2px 8px rgba(14,41,82,.3); }\n  #bx-map .precinct-tip::before { display:none; }\n  #bx-map .bx-legend { background:#fff; color:#0e2952; padding:10px 12px; border-radius:10px; border:2px solid #0e2952; line-height:1.7; font-size:13px; }\n  #bx-map .bx-legend .sw { display:inline-block; width:22px; height:13px; vertical-align:middle; margin-right:7px; border-radius:3px; box-sizing:border-box; }\n  #bx-map .leaflet-popup-content-wrapper { border-radius:12px; border:2px solid #0e2952; box-shadow:0 6px 18px rgba(14,41,82,.2); color:#0e2952; }\n  #bx-map .leaflet-popup-tip { background:#0e2952; }\n  #bx-map .leaflet-bar a { color:#0e2952; }\n  #bx-map .leaflet-tile-pane { filter: saturate(.45) contrast(.92); }\n  #bx-map .leaflet-control-attribution a { color:#0e2952; }\n  #bx-wrap .bx-cta, #bx-map .bx-cta { display:inline-block; margin-top:8px; padding:7px 14px; border-radius:999px; background:#fa721e; color:#fff !important; font-weight:600; font-size:13px; text-decoration:none !important; border:2px solid #fff; box-shadow:0 0 0 2px #fa721e; }\n  #bx-wrap .bx-cta:hover, #bx-map .bx-cta:hover { background:#e8630f; }\n  #bx-wrap .bx-tab { padding:9px 20px; border-radius:999px; font-size:14px; font-weight:600; font-family:inherit; cursor:pointer; background:#fff; color:#0e2952; border:2px solid #0e2952; }\n  #bx-wrap .bx-tab.active { background:#0e2952; color:#fff; }\n  #bx-wrap .bx-sugg li .bx-badge { display:inline-block; font-size:11px; font-weight:700; padding:1px 8px; border-radius:999px; margin-left:6px; vertical-align:1px; }\n  #bx-wrap .bx-badge-active { background:#e7f5ec; color:#177245; }\n  #bx-wrap .bx-badge-susp { background:#fdeee3; color:#c2410c; }\n  #bx-wrap .bx-note { font-size:12.5px; color:#5b6b82; margin:6px 2px 0; }';
+  style.textContent = '#bx-wrap { font-family: inherit; color: #1a1a1a; }\n  #bx-map .leaflet-container { font: 13px/1.4 "Prompt", Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }\n  #bx-wrap .bx-input { width:100%; box-sizing:border-box; padding:12px 16px; border:2px solid #1a1a1a; border-radius:999px; font-size:16px; font-family:inherit; color:#1a1a1a; background:#fff; outline:none; }\n  #bx-wrap .bx-input:focus { box-shadow:0 0 0 3px rgba(236,31,39,.3); }\n  #bx-wrap .bx-input::placeholder { color:#777777; }\n  #bx-wrap .bx-btn { padding:12px 22px; border-radius:999px; font-size:15px; font-weight:600; font-family:inherit; cursor:pointer; letter-spacing:.02em; white-space:nowrap; }\n  #bx-wrap .bx-btn-primary { background:#ec1f27; color:#fff; border:2px solid #fff; box-shadow:0 0 0 2px #ec1f27; }\n  #bx-wrap .bx-btn-primary:hover { background:#c4161d; }\n  #bx-wrap .bx-btn-secondary { background:#fff; color:#1a1a1a; border:2px solid #1a1a1a; }\n  #bx-wrap .bx-btn-secondary:hover { background:#fdeceb; }\n  #bx-wrap .bx-sugg { position:absolute; left:12px; right:12px; top:calc(100% + 4px); z-index:2000; background:#fff; border:2px solid #1a1a1a; border-radius:14px; box-shadow:0 6px 18px rgba(0,0,0,.15); margin:0; padding:6px 0; list-style:none; max-height:280px; overflow-y:auto; }\n  #bx-wrap .bx-sugg li { padding:9px 16px; cursor:pointer; font-size:15px; line-height:1.3; color:#1a1a1a; }\n  #bx-wrap .bx-sugg li small { display:block; color:#666666; font-size:12.5px; }\n  #bx-wrap .bx-sugg li:hover, #bx-wrap .bx-sugg li.active { background:#fdeceb; }\n  #bx-map .precinct-tip { background:#1a1a1a; color:#fff; border:0; border-radius:8px; padding:5px 10px; font-weight:600; box-shadow:0 2px 8px rgba(0,0,0,.3); }\n  #bx-map .precinct-tip::before { display:none; }\n  #bx-map .bx-legend { background:#fff; color:#1a1a1a; padding:10px 12px; border-radius:10px; border:2px solid #1a1a1a; line-height:1.7; font-size:13px; }\n  #bx-map .bx-legend .sw { display:inline-block; width:22px; height:13px; vertical-align:middle; margin-right:7px; border-radius:3px; box-sizing:border-box; }\n  #bx-map .leaflet-popup-content-wrapper { border-radius:12px; border:2px solid #1a1a1a; box-shadow:0 6px 18px rgba(0,0,0,.18); color:#1a1a1a; }\n  #bx-map .leaflet-popup-tip { background:#1a1a1a; }\n  #bx-map .leaflet-bar a { color:#1a1a1a; }\n  #bx-map.leaflet-container:focus:not(:focus-visible) { outline:none; }\n  #bx-map .leaflet-tile-pane { filter: grayscale(1) contrast(.9) brightness(1.04); }\n  #bx-map .leaflet-control-attribution a { color:#1a1a1a; }\n  #bx-wrap .bx-cta, #bx-map .bx-cta { display:inline-block; margin-top:8px; padding:7px 14px; border-radius:999px; background:#ec1f27; color:#fff !important; font-weight:600; font-size:13px; text-decoration:none !important; border:2px solid #fff; box-shadow:0 0 0 2px #ec1f27; }\n  #bx-wrap .bx-cta:hover, #bx-map .bx-cta:hover { background:#c4161d; }\n  #bx-wrap .bx-tab { padding:9px 20px; border-radius:999px; font-size:14px; font-weight:600; font-family:inherit; cursor:pointer; background:#fff; color:#1a1a1a; border:2px solid #1a1a1a; }\n  #bx-wrap .bx-tab.active { background:#ec1f27; border-color:#ec1f27; color:#fff; }\n  #bx-wrap .bx-sugg li .bx-badge { display:inline-block; font-size:11px; font-weight:700; padding:1px 8px; border-radius:999px; margin-left:6px; vertical-align:1px; }\n  #bx-wrap .bx-badge-active { background:#e7f5ec; color:#177245; }\n  #bx-wrap .bx-badge-susp { background:#fdeee3; color:#c2410c; }\n  #bx-wrap .bx-note { font-size:12.5px; color:#666666; margin:6px 2px 0; }\n  #bx-wrap .bx-header { display:flex; align-items:center; gap:14px; background:#ec1f27; color:#fff; border-radius:16px; padding:14px 18px; margin:0 0 12px; }\n  #bx-wrap .bx-rose { width:52px; height:52px; flex:0 0 52px; }\n  #bx-wrap .bx-title { font-size:24px; font-weight:800; letter-spacing:-.01em; line-height:1.15; text-transform:uppercase; }\n  #bx-wrap .bx-sub { font-size:13.5px; opacity:.92; margin-top:2px; }\n  @media (max-width:520px) { #bx-wrap .bx-title { font-size:19px; } #bx-wrap .bx-rose { width:42px; height:42px; flex-basis:42px; } }';
   document.head.appendChild(style);
 
   var TAB_LABELS = { voter: "Voter lookup", address: "Address search", polling: "Polling places" };
@@ -46,9 +46,22 @@
         return '<button type="button" class="bx-tab' + (i === 0 ? " active" : "") + '" data-tab="' + m + '">' + TAB_LABELS[m] + "</button>";
       }).join("") + "</div>"
     : "";
-  root.innerHTML = '<div id="bx-wrap" style="width:100%">\n  ' + tabBar + "\n  " +
+  // Red header band with a rose. data-title="..." changes the heading; data-header="off" hides the band.
+  var ROSE = '<svg class="bx-rose" viewBox="0 0 48 48" aria-hidden="true">' +
+    '<circle cx="24" cy="24" r="23" fill="#fff"/>' +
+    '<path d="M24 29v14" stroke="#1a1a1a" stroke-width="2.4" stroke-linecap="round"/>' +
+    '<path d="M24 38c-4.5.4-8-1.8-9.5-5.5 4.2-.6 7.6 1.2 9.5 5.5z" fill="#1a1a1a"/>' +
+    '<path d="M24 35c4-.2 7-2.4 8-5.8-3.8-.2-6.8 1.8-8 5.8z" fill="#1a1a1a"/>' +
+    '<path d="M24 30c-6.5 0-10.5-4.4-10.5-10.2 0-2.6.8-5 2.2-6.8 1.4 2.2 3.6 3.5 6 3.9-.6-3.6.7-7.2 3.4-9.4 2 2 3.2 4.8 3.1 7.8 2.4-.9 4.4-2.6 5.4-4.9 1.8 2 2.9 4.6 2.9 7.5C36.5 25.7 31 30 24 30z" fill="#ec1f27"/>' +
+    '<path d="M18.5 19.5c1.5 3.2 4.3 4.8 8 4.4M22.4 16.8c.4 2.6 2.4 4.2 5 4.2M30 17.5c.2 3.8-2 6.6-5.6 7.6" stroke="#fff" stroke-width="1.3" fill="none" stroke-linecap="round"/>' +
+    '</svg>';
+  var TITLE = root.getAttribute("data-title") || "Bexar County Voter Map";
+  var header = root.getAttribute("data-header") === "off" ? "" :
+    '<div class="bx-header">' + ROSE + '<div><div class="bx-title">' + TITLE.replace(/[<>&]/g, "") + "</div>" +
+    '<div class="bx-sub">Check your registration &middot; find your precinct &middot; find where to vote</div></div></div>';
+  root.innerHTML = '<div id="bx-wrap" style="width:100%">\n  ' + header + tabBar + "\n  " +
     MODES.map(function (m) { return FORMS[m]; }).join("\n  ") +
-    '\n  <div id="bx-result" style="min-height:24px;margin:0 0 10px;font-size:16px"></div>\n  <div id="bx-map" style="height:560px;width:100%;border-radius:16px;overflow:hidden;background:#f8f4ec;border:2px solid #0e2952"></div>\n</div>';
+    '\n  <div id="bx-result" style="min-height:24px;margin:0 0 10px;font-size:16px"></div>\n  <div id="bx-map" style="height:560px;width:100%;border-radius:16px;overflow:hidden;background:#fdeceb;border:2px solid #1a1a1a"></div>\n</div>';
 
   // ---- load Leaflet (once), then boot ---------------------------
   function loadLeaflet(cb) {
@@ -64,7 +77,7 @@
   }
 
 function start(DATA_BASE) {
-  var NAVY = "#0e2952", ORANGE = "#fa721e", LIGHT_BLUE = "#8eb8cc";
+  var INK = "#1a1a1a", RED = "#ec1f27";
   // ------------------------------------------------------------
 
   function base(p) { return (DATA_BASE ? DATA_BASE.replace(/\/$/, "") + "/" : "") + p; }
@@ -87,25 +100,42 @@ function start(DATA_BASE) {
     var precincts = res[0], outline = res[1], voterCounts = res[2];
 
     // 1) Light county shading underneath everything
-    L.geoJSON(outline, { style: { stroke: false, fillColor: NAVY, fillOpacity: 0.12 }, interactive: false }).addTo(map);
+    L.geoJSON(outline, { style: { stroke: false, fillColor: RED, fillOpacity: 0.06 }, interactive: false }).addTo(map);
 
     // 2) Precinct boundaries (hover to highlight in orange)
+    // One canvas for all 806 precincts: hover hit-testing stays reliable (SVG paths
+    // re-ordered by bringToFront can swallow mouseout, leaving stale highlights).
+    // Only one precinct is ever highlighted; any new hover/tap clears the old one.
+    var hovered = null;
+    function unhighlight() { if (hovered) { precinctLayer.resetStyle(hovered); hovered.closeTooltip(); hovered = null; } }
+    function highlight(layer) {
+      if (hovered === layer) return;
+      unhighlight();
+      hovered = layer;
+      layer.setStyle({ fillColor: RED, fillOpacity: 0.35, color: RED, weight: 2.5, opacity: 1 });
+      layer.bringToFront();
+    }
     precinctLayer = L.geoJSON(precincts, {
-      style: { color: NAVY, weight: 0.8, opacity: 0.45, fillColor: NAVY, fillOpacity: 0 },
+      renderer: L.canvas({ padding: 0.5, tolerance: 0 }),
+      style: { color: INK, weight: 0.7, opacity: 0.35, fillColor: INK, fillOpacity: 0 },
       onEachFeature: function (f, layer) {
         var vc = voterCounts[String(f.properties.p)];
         layer.bindTooltip("Precinct " + f.properties.p +
           (vc ? '<br><span style="font-weight:400">' + vc.total.toLocaleString() + " registered &middot; " + vc.active.toLocaleString() + " active</span>" : ""),
           { sticky: true, className: "precinct-tip", direction: "top" });
         layer.on({
-          mouseover: function (e) { e.target.setStyle({ fillColor: ORANGE, fillOpacity: 0.45, color: ORANGE, weight: 2.5, opacity: 1 }); e.target.bringToFront(); },
-          mouseout: function (e) { precinctLayer.resetStyle(e.target); }
+          mouseover: function (e) { highlight(e.target); },
+          mouseout: function (e) { if (hovered === e.target) unhighlight(); },
+          click: function (e) { L.DomEvent.stopPropagation(e); highlight(e.target); e.target.openTooltip(e.latlng); }  // touch
         });
       }
     }).addTo(map);
 
+    map.on("click", unhighlight);                                  // tap empty map clears
+    map.getContainer().addEventListener("mouseleave", unhighlight);
+
     // 3) Bold county outline on top
-    outlineLayer = L.geoJSON(outline, { style: { color: NAVY, weight: 3.5, opacity: 1, fill: false }, interactive: false }).addTo(map);
+    outlineLayer = L.geoJSON(outline, { style: { color: RED, weight: 3.5, opacity: 1, fill: false }, interactive: false }).addTo(map);
     outlineLayer.bringToFront();
 
     function fit() { map.invalidateSize(); map.fitBounds(outlineLayer.getBounds(), { padding: [12, 12] }); }
@@ -117,8 +147,8 @@ function start(DATA_BASE) {
     legend.onAdd = function () {
       var d = L.DomUtil.create("div", "bx-legend");
       d.innerHTML =
-        '<div><span class="sw" style="border:2px solid ' + NAVY + ';background:rgba(14,41,82,.12)"></span><strong>Bexar County</strong></div>' +
-        '<div><span class="sw" style="border:1px solid ' + NAVY + ';opacity:.7"></span>Voting precinct</div>';
+        '<div><span class="sw" style="border:2px solid ' + RED + ';background:rgba(236,31,39,.08)"></span><strong>Bexar County</strong></div>' +
+        '<div><span class="sw" style="border:1px solid ' + INK + ';opacity:.7"></span>Voting precinct</div>';
       return d;
     };
     legend.addTo(map);
@@ -162,7 +192,7 @@ function start(DATA_BASE) {
 
   function setResult(html, isErr) {
     resultEl.innerHTML = html;
-    resultEl.style.color = isErr ? "#c2410c" : "#0e2952";
+    resultEl.style.color = isErr ? "#c2410c" : "#1a1a1a";
   }
 
   function enableLookup(precincts, outline) {
@@ -174,12 +204,12 @@ function start(DATA_BASE) {
         if (inFeature(pt, precincts.features[i])) { pct = precincts.features[i].properties.p; break; }
       }
       if (marker) map.removeLayer(marker);
-      marker = L.circleMarker([lat, lng], { radius: 9, color: "#fff", weight: 3, fillColor: ORANGE, fillOpacity: 1 }).addTo(map);
+      marker = L.circleMarker([lat, lng], { radius: 9, color: "#fff", weight: 3, fillColor: RED, fillOpacity: 1 }).addTo(map);
       var msg = inCounty
-        ? '<strong style="color:#fa721e">&#10003; In Bexar County</strong>' + (pct != null ? ' <span style="color:#0e2952">&middot; Precinct ' + pct + "</span>" : "")
-        : '<strong style="color:#0e2952">Outside Bexar County</strong>';
+        ? '<strong style="color:#ec1f27">&#10003; In Bexar County</strong>' + (pct != null ? ' <span style="color:#1a1a1a">&middot; Precinct ' + pct + "</span>" : "")
+        : '<strong style="color:#1a1a1a">Outside Bexar County</strong>';
       if (info) msg = info + "<br>" + msg;
-      if (label) msg += '<div style="font-size:13px;color:#5b6b82">' + label + "</div>";
+      if (label) msg += '<div style="font-size:13px;color:#666666">' + label + "</div>";
       marker.bindPopup(msg).openPopup();
       setResult(msg);
       map.flyTo([lat, lng], Math.max(map.getZoom(), 13.5));
@@ -372,7 +402,7 @@ function start(DATA_BASE) {
     function renderVoters(list) {
       vMatches = list; vActive = -1; vsuggEl.innerHTML = "";
       if (!list.length) {
-        vsuggEl.innerHTML = '<li style="cursor:default;color:#5b6b82">No matching Bexar County voters found</li>';
+        vsuggEl.innerHTML = '<li style="cursor:default;color:#666666">No matching Bexar County voters found</li>';
         vsuggEl.hidden = false; return;
       }
       list.slice(0, V_SHOW).forEach(function (v, i) {
@@ -386,7 +416,7 @@ function start(DATA_BASE) {
       });
       if (list.length > V_SHOW) {
         var more = document.createElement("li");
-        more.style.cursor = "default"; more.style.color = "#5b6b82";
+        more.style.cursor = "default"; more.style.color = "#666666";
         more.textContent = (list.length >= V_CAP ? V_CAP + "+" : list.length) + " matches — keep typing to narrow down";
         vsuggEl.appendChild(more);
       }
@@ -398,15 +428,15 @@ function start(DATA_BASE) {
       vinput.value = titleCase(v[0]);
       var info = "<strong>" + titleCase(v[0]) + "</strong> " +
         '<span style="font-weight:600;color:' + (v[2] ? '#177245">Active' : '#c2410c">Suspense') + "</span>" +
-        ' <span style="color:#0e2952">&middot; Registered in Precinct ' + v[1] + "</span>";
+        ' <span style="color:#1a1a1a">&middot; Registered in Precinct ' + v[1] + "</span>";
       if (v[3].indexOf("***") !== -1) {   // county-redacted (address confidentiality program)
-        setResult(info + '<div style="font-size:13px;color:#5b6b82">This voter&rsquo;s address is confidential in the county&rsquo;s public records, so it can&rsquo;t be shown on the map.</div>');
+        setResult(info + '<div style="font-size:13px;color:#666666">This voter&rsquo;s address is confidential in the county&rsquo;s public records, so it can&rsquo;t be shown on the map.</div>');
         return;
       }
       setResult("Locating&hellip;");
       geocode(v[3], null).then(function (c) {
         if (c) showPoint(c.location.y, c.location.x, titleCase(c.address), info);
-        else setResult(info + '<div style="font-size:13px;color:#5b6b82">' + titleCase(v[3]) + " (couldn&rsquo;t place on the map)</div>");
+        else setResult(info + '<div style="font-size:13px;color:#666666">' + titleCase(v[3]) + " (couldn&rsquo;t place on the map)</div>");
       }).catch(function () { setResult(info); });
     }
 
@@ -475,10 +505,10 @@ function start(DATA_BASE) {
     };
     function siteCard(title, hours, hit, fromLat, fromLng) {
       var s = hit.site;
-      return '<div style="flex:1 1 240px;border:2px solid #0e2952;border-radius:14px;padding:12px 14px;background:#fff">' +
-        '<div style="font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#fa721e">' + title + "</div>" +
+      return '<div style="flex:1 1 240px;border:2px solid #1a1a1a;border-radius:14px;padding:12px 14px;background:#fff">' +
+        '<div style="font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#ec1f27">' + title + "</div>" +
         '<div style="font-weight:700;margin:2px 0">' + s.n + "</div>" +
-        '<div style="font-size:13px;color:#5b6b82">' + (s.r ? s.r + " &middot; " : "") + s.a + "</div>" +
+        '<div style="font-size:13px;color:#666666">' + (s.r ? s.r + " &middot; " : "") + s.a + "</div>" +
         '<div style="font-size:13px;margin-top:4px">' + hit.mi.toFixed(1) + " mi away &middot; " + hours +
         (s.note ? "<br><em>" + s.note + "</em>" : "") + "</div>" +
         '<a class="bx-cta" href="' + dirLink(fromLat, fromLng, s) + '" target="_blank" rel="noopener">Directions &rarr;</a></div>';
@@ -490,13 +520,13 @@ function start(DATA_BASE) {
         pollMarkers.forEach(function (m) { map.removeLayer(m); });
         pollMarkers = [];
         if (marker) map.removeLayer(marker);
-        marker = L.circleMarker([lat, lng], { radius: 9, color: "#fff", weight: 3, fillColor: ORANGE, fillOpacity: 1 })
+        marker = L.circleMarker([lat, lng], { radius: 9, color: "#fff", weight: 3, fillColor: RED, fillOpacity: 1 })
           .addTo(map).bindPopup(label || "You are here");
         var pts = [[lat, lng]];
         [{ hit: ev, t: "Early voting" }, { hit: ed, t: "Election day" }].forEach(function (x) {
           if (!x.hit) return;
           var s = x.hit.site;
-          var m = L.circleMarker([s.lat, s.lng], { radius: 8, color: "#fff", weight: 3, fillColor: NAVY, fillOpacity: 1 })
+          var m = L.circleMarker([s.lat, s.lng], { radius: 8, color: "#fff", weight: 3, fillColor: INK, fillOpacity: 1 })
             .addTo(map).bindPopup("<strong>" + s.n + "</strong><br>" + x.t + " &middot; " + x.hit.mi.toFixed(1) + " mi<br>" + s.a +
               '<br><a class="bx-cta" href="' + dirLink(lat, lng, s) + '" target="_blank" rel="noopener">Directions &rarr;</a>');
           pollMarkers.push(m);
@@ -505,8 +535,8 @@ function start(DATA_BASE) {
         var html = '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
           (ev ? siteCard("Closest early voting &middot; Oct 19&ndash;30", EV_HOURS[ev.site.h] || "", ev, lat, lng) : "") +
           (ed ? siteCard("Closest on election day &middot; Tue Nov 3", "7am&ndash;7pm", ed, lat, lng)
-              : '<div style="flex:1 1 240px;border:2px dashed #0e2952;border-radius:14px;padding:12px 14px;background:#fff">' +
-                '<div style="font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#fa721e">Election day &middot; Tue Nov 3</div>' +
+              : '<div style="flex:1 1 240px;border:2px dashed #1a1a1a;border-radius:14px;padding:12px 14px;background:#fff">' +
+                '<div style="font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#ec1f27">Election day &middot; Tue Nov 3</div>' +
                 '<div style="font-size:13px;margin-top:4px">Open 7am&ndash;7pm. The county hasn&rsquo;t posted its Election Day vote centers yet &mdash; they&rsquo;ll appear here once published.</div></div>') + "</div>" +
           '<div class="bx-note">Bexar County uses vote centers &mdash; you can vote at <strong>any</strong> location in the county; these are just the closest to you.</div>';
         setResult(html);
