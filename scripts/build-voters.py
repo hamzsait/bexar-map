@@ -10,7 +10,7 @@ Only NAME, Status, Residential Address and Precinct are kept; VUID, DOB, gender,
 mailing address, vote history and everything else are dropped.
 
 Shards: each voter goes in the shard(s) named for the first two letters of each
-part of their last name (e.g. GARCIA-LOPEZ -> GA.json and LO.json). The widget
+part of their last name (e.g. GARCIA-LOPEZ -> GA.json and LO.json; O'BRIEN -> OB.json and BR.json). The widget
 loads the shards for the first two letters of every word the user types, so
 "Maria Garcia" and "Garcia Maria" both work, and nobody downloads the whole roll.
 Rows: [name, precinct, active (1/0), residential address]  ("***" = confidential).
@@ -49,8 +49,11 @@ for path in sys.argv[1:]:
         n += 1
         counts[str(pct)]["total"] += 1
         counts[str(pct)]["active"] += active
+        # Index under each part of the last name, with apostrophes both dropped and
+        # treated as breaks: O'BRIEN -> OB (OBRIEN) and BR (BRIEN); GARCIA-LOPEZ -> GA, LO.
         last = name.split(",")[0]
-        for k in {w[:2] for w in re.split(r"[\s\-']+", last) if len(re.sub(r"[^A-Z]", "", w)) >= 2 and w[:2].isalpha()}:
+        parts = [w.replace("'", "") for w in re.split(r"[\s\-]+", last)] + re.split(r"[\s\-']+", last)
+        for k in {w[:2] for w in parts if len(w) >= 2 and w[:2].isalpha()}:
             shards[k].append([name, pct, active, addr])
 
 json.dump(dict(sorted(counts.items(), key=lambda kv: int(kv[0]))), open(ROOT / "bx-voters.json", "w"), separators=(",", ":"))
