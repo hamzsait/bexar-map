@@ -6,8 +6,10 @@ record under Tex. Elec. Code 18.008; delivered as one CSV per commissioner preci
   python3 scripts/build-voters.py VOTERLISTREPORT_BC_PCT1.csv ... VOTERLISTREPORT_BC_PCT4.zip
 
 Accepts .csv files or .zip files containing one CSV.
-Only NAME, Status, Residential Address and Precinct are kept; VUID, DOB, gender,
-mailing address, vote history and everything else are dropped.
+Only NAME, Status, residential address and Precinct are kept; VUID, DOB, gender,
+mailing address, vote history and everything else are dropped. Handles both the
+older files (combined "Residential Address" column) and the Sep 2026+ files
+(address only as parts: Street Number 1, Pre-Direction, Street Name 1, ...).
 
 Shards: each voter goes in the shard(s) named for the first two letters of each
 part of their last name (e.g. GARCIA-LOPEZ -> GA.json and LO.json; O'BRIEN -> OB.json and BR.json). The widget
@@ -29,6 +31,26 @@ def rows(path):
         f = open(path, encoding="utf-8", errors="replace")
     yield from csv.DictReader(f)
 
+def f(r, k): return re.sub(r"\s+", " ", (r.get(k) or "")).strip().upper()
+
+def residential(r):
+    """Residential address from its parts (Sep 2026+ files have no combined column).
+    Includes street type and unit, which the older combined column left out. Never
+    uses the mailing address."""
+    if "Street Name 1" not in r:
+        return r["Residential Address"]
+    name, pre, post, typ = f(r, "Street Name 1"), f(r, "Pre-Direction"), f(r, "Post-Direction"), f(r, "Street Type")
+    parts = [f(r, "Street Number 1")]
+    if pre and not name.startswith(pre + " "): parts.append(pre)        # name often already has "E RISCHE"
+    parts.append(name)
+    if typ and not name.endswith(" " + typ): parts.append(typ)
+    if post and not name.endswith(" " + post): parts.append(post)
+    unit, utype = f(r, "Unit"), f(r, "Unit Type")
+    if unit: parts.append(utype + " " + unit if utype else "#" + unit)
+    street = " ".join(x for x in parts if x)
+    if "***" in street: return "***"                                     # address-confidentiality program
+    return f"{street} {f(r, 'City')} {f(r, 'State')} {f(r, 'Zip Code 5')}"
+
 def clean_addr(a):
     a = re.sub(r"\s+", " ", a).strip()
     if "***" in a: return "***"
@@ -45,7 +67,7 @@ for path in sys.argv[1:]:
         if not m: continue
         pct, active = int(m.group()), 1 if r["Status"].strip().upper() == "ACTIVE" else 0
         name = re.sub(r"\s+", " ", r["NAME"]).strip().upper()
-        addr = clean_addr(r["Residential Address"])
+        addr = clean_addr(residential(r))
         n += 1
         counts[str(pct)]["total"] += 1
         counts[str(pct)]["active"] += active

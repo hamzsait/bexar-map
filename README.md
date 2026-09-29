@@ -20,12 +20,13 @@ countywide counterpart of [district1-map](https://github.com/hamzsait/district1-
 ## Data sources
 
 - **Precincts:** Bexar County GIS, `maps.bexar.org` → `EL/VoterPrecincts`. Rebuild with `python3 scripts/build-data.py` (needs `shapely`).
-- **Voters:** the Bexar County Elections Dept. voter list report (a public record under Tex. Elec. Code §18.008), delivered as one file per commissioner precinct. The current data is from **February 2026** (1,293,553 voters). Registrations after about Feb 11, 2026 are missing, and the county was at ~1,312,750 voters as of 8/28/2026. Rebuild with a fresh list:
+- **Voters:** the Bexar County Elections Dept. voter list report (a public record under Tex. Elec. Code §18.008), delivered as one file per commissioner precinct. Current data: **September 24, 2026** (1,316,595 voters: 1,156,918 active, 159,677 suspense). Rebuild with a fresh list:
 
   ```sh
-  python3 scripts/build-voters.py VOTERLISTREPORT_BC_PCT1.csv VOTERLISTREPORT_BC_PCT2.csv VOTERLISTREPORT_BC_PCT3.csv VOTERLISTREPORT_BC_PCT4.zip
+  python3 scripts/build-voters.py VoterList_BexarCounty_Pct1_Sep2026.csv VoterList_BexarCounty_Pct2_Sep2026.csv VoterList_BexarCounty_Pct3_Sep2026.csv VoterList_BexarCounty_Pct4_Sep2026.csv
   ```
 
+  The script accepts the older files, which have a combined "Residential Address" column, and the Sep 2026 files, which only have the address parts (Street Number 1, Pre-Direction, Street Name 1, …) and are assembled into one address. It never uses the mailing address.
   Only name, status, residential address, and precinct are kept. VUID, DOB, gender, mailing address, vote history, and everything else are dropped. Addresses in the address-confidentiality program arrive from the county as `***` and are shown as "Address confidential".
 - **Polling places:** the county's official [Early Voting Sites and Hours PDF](https://elections.bexar.gov/DocumentCenter/View/1712) for Nov 3, 2026, transcribed into `scripts/polling-locations.csv`. Rebuild with `python3 scripts/build-polling.py`, which geocodes with the county locator and falls back to Census. **Election Day vote centers aren't published yet.** When the county posts them (usually in October), add them as `kind=ed` rows (or `both` for sites used for both) and rerun the script. The widget shows a placeholder card until then.
 - **Geocoder:** `maps.bexar.org/arcgis/rest/services/Locators/BeCoMultiRole/GeocodeServer`, Bexar County's own public locator. It has typeahead and CORS, and needs no API key. It only knows Bexar County addresses, so out-of-county searches report "Couldn't find that address". If it were ever retired, `suggest()`/`geocode()` in `bx-widget.js` are the only two functions to swap.

@@ -133,7 +133,7 @@
         '<div class="bx-field"><input id="bx-vq" class="bx-input" type="text" inputmode="search" placeholder="Name, e.g. Garcia Maria" aria-label="Voter name" ' +
           'role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="bx-vsugg" />' +
         '<ul id="bx-vsugg" class="bx-sugg" role="listbox" aria-label="Matching voters" hidden></ul></div>' +
-        '<div class="bx-note">Searches the Bexar County voter roll (county list as of February 2026 &mdash; newer registrations won&rsquo;t appear).</div>' +
+        '<div class="bx-note">Searches the Bexar County voter roll (county list as of September 24, 2026).</div>' +
       "</form>",
     address:
       '<form class="bx-form" id="bx-aform" data-tab="address" role="tabpanel" aria-label="Address search" autocomplete="off">' +
