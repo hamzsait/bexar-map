@@ -101,6 +101,7 @@
     "#bx-map .bx-legend { background:#fff; color:" + INK + "; padding:8px 12px; border-radius:10px; border:2px solid " + INK + "; line-height:1.7; font-size:13px; }",
     "#bx-map .bx-legend .sw { display:inline-block; width:22px; height:13px; vertical-align:middle; margin-right:7px; border-radius:3px; }",
     "#bx-map .bx-legend .dot { display:inline-block; width:13px; height:13px; margin:0 11px 0 4px; vertical-align:middle; border-radius:50%; border:2px solid #fff; box-shadow:0 0 0 1px #999; }",
+    "#bx-map .bx-pin span { display:block; width:100%; height:100%; box-sizing:border-box; border-radius:50%; border:3px solid #fff; }",
     "#bx-map .leaflet-popup-content-wrapper { border-radius:12px; border:2px solid " + INK + "; box-shadow:0 6px 18px rgba(0,0,0,.18); color:" + INK + "; }",
     "#bx-map .leaflet-popup-tip { background:" + INK + "; }",
     "#bx-map .leaflet-bar a { color:" + INK + "; }",
@@ -323,9 +324,14 @@ function start() {
     setResult("");
     if (hadPins) fitCounty();
   }
+  // An HTML marker, not a circleMarker: vector layers get CSS-scaled while a zoom animates (the dot
+  // would balloon ~10x mid-flight); markers are only repositioned, so the dot stays one size.
   function pin(lat, lng, color, popupHtml) {
-    return L.circleMarker([lat, lng], { radius: color === RED ? 9 : 8, color: "#fff", weight: 3, fillColor: color, fillOpacity: 1 })
-      .addTo(resultLayer).bindPopup(popupHtml);
+    var d = color === RED ? 21 : 19;
+    return L.marker([lat, lng], {
+      icon: L.divIcon({ className: "bx-pin", html: '<span style="background:' + color + '"></span>', iconSize: [d, d], popupAnchor: [0, -d / 2 - 5] }),   // popup tip rests on top of the dot
+      keyboard: false, zIndexOffset: color === RED ? 0 : 1000
+    }).addTo(resultLayer).bindPopup(popupHtml);
   }
 
   // Show an address/point: pin + "In Bexar County · Precinct N".
