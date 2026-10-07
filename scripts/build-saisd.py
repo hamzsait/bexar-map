@@ -11,11 +11,17 @@ Sources (downloaded into scripts/.saisd-cache/, which is gitignored):
     2021-05-01  "Precinct Report" (PDF, Electionware) DocumentCenter/View/1407
     2023-05-06  "Precinct by Precinct Results" (PDF)  DocumentCenter/View/1268
     2025-05-03  "Official Precinct Report" (CSV)      DocumentCenter/View/1224
-  Precinct boundaries: Texas Legislative Council VTD shapefiles (data.capitol.texas.gov/dataset/vtds)
-    2017, 2019, 2021 -> VTDs20G (2020 general; no 2016/2018 vintage is published, and Bexar
-                        didn't redraw precincts until late 2021, so these are the closest available)
-    2023 -> VTDs_22G     2025 -> VTDs_24PG
+  Precinct boundaries (the precinct set in force at each election):
+    2017 -> TLC 2016 general-election precincts, via VEST (Harvard Dataverse doi:10.7910/DVN/NH5S2I,
+            tx_2016, field PREC). Bexar renumbered/redrew precincts between May 2017 and Nov 2018, so
+            2020 shapes would misplace 2017 precincts (verified: the May 2017 report's precinct numbers
+            match the 2016 set exactly).
+    2019, 2021 -> TLC VTDs20G (2020 general; identical to the 2018 set for these precincts)
+    2023 -> TLC VTDs_22G     2025 -> TLC VTDs_24PG     (data.capitol.texas.gov/dataset/vtds)
+    TLC stores some precincts in lettered parts (2039A, 2039B, ...): parts are unioned back together.
     A precinct missing from its vintage falls back to the same number in another vintage (flagged).
+  Map geometry is clipped to the SAISD boundary (precincts straddling the district line are drawn
+  only inside SAISD; vote counts are the precinct's full SAISD-race totals either way).
   SAISD boundary: Census TIGERweb Unified School Districts (GEOID 4838730).
 
 Output geometry is simplified (~3 m) and rounded to 5 decimals.
@@ -35,15 +41,19 @@ OUT = ROOT / "SAISD" / "saisd-data.json"
 DOC = "https://elections.bexar.gov/DocumentCenter/View/"
 TLC = "https://data.capitol.texas.gov/dataset/4d8298d0-d176-4c19-b174-42837027b73e/resource/"
 ELECTIONS = [  # year, date, doc id, filename, parser, vtd vintage
-    (2017, "2017-05-06", 1558, "2017.htm", "htm", "20"),
+    (2017, "2017-05-06", 1558, "2017.htm", "htm", "16"),
     (2019, "2019-05-04", 1437, "2019.htm", "htm", "20"),
     (2021, "2021-05-01", 1407, "2021.pdf", "pdf", "20"),
     (2023, "2023-05-06", 1268, "2023.pdf", "pdf", "22"),
     (2025, "2025-05-03", 1224, "2025.csv", "csv", "24"),
 ]
-VTDS = {"20": ("06157b97-40b8-43af-99d5-bd9b5850b15e/download/vtds20g_2020.zip", "VTDs20G_2020"),
+# Seats up that year but not on the ballot (unopposed; election cancelled for that seat).
+UNCONTESTED = {2017: [7], 2025: [4, 7]}
+VTDS = {"16": ("https://dataverse.harvard.edu/api/access/datafile/12070340", "tx_2016", "PREC"),
+        "20": ("06157b97-40b8-43af-99d5-bd9b5850b15e/download/vtds20g_2020.zip", "VTDs20G_2020"),
         "22": ("037e1de6-a862-49de-ae31-ae609e214972/download/vtds_22g.zip", "VTDs_22G"),
         "24": ("906f47e4-4e39-4156-b1bd-4969be0b2780/download/vtds_24pg.zip", "VTDs_24PG")}
+for _v in ("20", "22", "24"): VTDS[_v] = (TLC + VTDS[_v][0], VTDS[_v][1], "VTD")
 BEXAR_FIPS = 29
 
 def fetch(url, name):
@@ -128,30 +138,33 @@ def polys(g):
 def simp(g): return MultiPolygon([p for p in polys(rnd(g.simplify(0.00003, preserve_topology=True))) if p.area > 0])
 
 def load_vtds(v):
-    url, stem = VTDS[v]
-    z = fetch(TLC + url, f"vtds{v}.zip")
+    url, stem, field = VTDS[v]
+    z = fetch(url, f"vtds{v}.zip")
     d = CACHE / f"vtds{v}"
     if not d.exists(): zipfile.ZipFile(z).extractall(d)
     path = str(d / stem)
     tf = Transformer.from_crs(CRS.from_wkt(open(path + ".prj").read()), 4326, always_xy=True).transform
-    out = {}
+    parts = {}
     for sr in shapefile.Reader(path).iterShapeRecords():
         rec = sr.record.as_dict()
         if rec["CNTY"] == BEXAR_FIPS:
-            out[rec["VTD"].lstrip("0")] = make_valid(transform(tf, shape(sr.shape.__geo_interface__)))
-    return out
+            key = re.sub(r"[A-Z]+$", "", str(rec[field]).strip().lstrip("0"))   # 2039A, 2039B -> 2039
+            parts.setdefault(key, []).append(make_valid(transform(tf, shape(sr.shape.__geo_interface__))))
+    return {k: unary_union(g) if len(g) > 1 else g[0] for k, g in parts.items()}
 
 def main():
     vtds = {v: load_vtds(v) for v in VTDS}
     saisd = shape(json.loads(fetch(
         "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/School/MapServer/0/query?where=GEOID%3D%274838730%27&outSR=4326&f=geojson",
         "saisd.geojson").read_text())["features"][0]["geometry"])
+    saisd = make_valid(saisd)
     data = {"saisd": mapping(simp(saisd)), "elections": [], "vintages": {}}
     used = {v: set() for v in VTDS}
     for year, date, doc, fname, kind, vint in ELECTIONS:
         p = fetch(DOC + str(doc), fname)
         races = parse_htm(p) if kind == "htm" else parse_electionware(sections_pdf(p) if kind == "pdf" else sections_csv(p))
-        el = {"year": year, "date": date, "source": DOC + str(doc), "vintage": vint, "races": [], "unmapped": [], "fallback": []}
+        el = {"year": year, "date": date, "source": DOC + str(doc), "vintage": vint, "races": [], "unmapped": [], "fallback": [],
+              "uncontested": UNCONTESTED.get(year, [])}
         for d in sorted(races):
             pcts = races[d]
             cands = [c for c in next(iter(pcts.values())) if not c.endswith(" VOTES")]
@@ -166,7 +179,7 @@ def main():
                     if alt: used[alt].add(pct); el["fallback"].append([pct, alt]); geoms.append(vtds[alt][pct])
                     else: el["unmapped"].append(pct)
             # Approximate district outline: union of the race's precincts (SAISD publishes no district GIS).
-            outline = unary_union([g.buffer(0.00005) for g in geoms]).buffer(-0.00005)
+            outline = unary_union([g.buffer(0.00005) for g in geoms]).buffer(-0.00005).intersection(saisd)
             el["races"].append({"district": d, "candidates": cands, "totals": [totals[c] for c in cands], "precincts": rows,
                                 "outline": mapping(simp(outline))})
             print(year, "D%d" % d, {c: totals[c] for c in cands}, "precincts:", len(rows))
@@ -175,7 +188,7 @@ def main():
         data["elections"].append(el)
     for v, ps in used.items():
         data["vintages"][v] = {"type": "FeatureCollection", "features": [
-            {"type": "Feature", "properties": {"p": p}, "geometry": mapping(simp(vtds[v][p]))} for p in sorted(ps)]}
+            {"type": "Feature", "properties": {"p": p}, "geometry": mapping(simp(vtds[v][p].intersection(saisd)))} for p in sorted(ps)]}
     OUT.parent.mkdir(exist_ok=True)
     OUT.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")))
     print(f"wrote {OUT.relative_to(ROOT)} ({OUT.stat().st_size/1e3:.0f} KB)")

@@ -53,10 +53,15 @@ Three tools, shown as tabs. Choose which appear with `data-mode` on the embed di
 Sources and caveats:
 
 - **Results:** Bexar County Elections official precinct reports, parsed from the HTML (2017, 2019), PDF (2021, 2023) and CSV (2025) versions. Candidate totals match the county's official summary reports exactly.
-- **Precinct shapes:** Texas Legislative Council VTD shapefiles. 2021 uses the 2020 file, 2023 uses 2022, and 2025 uses 2024.
-  - 2017 and 2019 also use the 2020 shapes, since no older file is published. Bexar didn't redraw precincts until late 2021.
-  - Precinct 3206 (2021, 35 votes) has no published boundary. Its votes count in the totals but it isn't drawn.
+- **Precinct shapes:** each election uses the precinct boundaries in force that year.
+  - 2017 uses the Texas Legislative Council's 2016 general-election precincts, from [VEST on Harvard Dataverse](https://doi.org/10.7910/DVN/NH5S2I). Bexar renumbered and redrew precincts between May 2017 and late 2018, so 2020 shapes would put several 2017 precincts in the wrong place.
+  - 2019 and 2021 use TLC's 2020 file (the same as 2018 for these precincts), 2023 uses 2022, and 2025 uses 2024.
+  - Precincts TLC stores in lettered parts (e.g. 2039A/2039B) are merged back together, so every precinct in every race is mapped.
+  - Geometry is clipped to the SAISD boundary.
+- **Trustee districts:** SAISD redrew its trustee districts in 2022, so 2017–2021 use the old plan and 2023–2025 the new one. Uncontested seats with no election (2017 D7, 2025 D4 and D7) are noted on the page.
+- **Display:** ties are drawn gray, and precincts with fewer than 25 votes are drawn fainter.
 - **District outlines** are the union of the precincts that voted in each race, because SAISD doesn't publish its trustee districts as GIS data. They're approximate where a precinct is split between districts.
+- **Independent check (Oct 2026):** a separate parse of all five official reports matched every precinct row in all 15 races, and every race total matched the county's official summaries.
 - **SAISD boundary:** Census TIGERweb.
 
 ## Embed in Squarespace

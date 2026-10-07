@@ -26,7 +26,7 @@
 
   var INK = "#1a1a1a", RED = "#ec1f27", RED_DARK = "#c4161d", MUTED = "#666666";
   // Candidate colors by finish (winner first). Red is reserved for the brand/outlines.
-  var CAND_COLORS = ["#1d4ed8", "#f59e0b", "#059669", "#7c3aed"];
+  var CAND_COLORS = ["#1d4ed8", "#f59e0b", "#059669", "#7c3aed"], TIE = "#8a8a8a";
 
   var CSS = [
     "#sd-wrap { font-family: inherit; color:#fff; background:" + RED + "; border-radius:20px; padding:18px; box-sizing:border-box; width:100%; line-height:1.35; text-align:left; }",
@@ -109,8 +109,13 @@
     var d = new Date(iso + "T12:00:00");
     return d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
   }
-  // Fill strength from the winner's margin in that precinct (0 = tie, 50+ points = darkest).
-  function shade(margin) { return 0.18 + 0.67 * Math.min(1, Math.max(0, margin) / 0.5); }
+  // Fill strength from the winner's margin in that precinct (0 = tie, 50+ points = darkest),
+  // faded for precincts with very few votes so a 3-vote precinct doesn't look like a landslide.
+  var FEW_VOTES = 25;
+  function shade(margin, votes) {
+    var s = 0.18 + 0.67 * Math.min(1, Math.max(0, margin) / 0.5);
+    return votes == null || votes >= FEW_VOTES ? s : Math.max(0.12, s * (0.35 + 0.65 * votes / FEW_VOTES));
+  }
 
 function start() {
   var $ = function (id) { return document.getElementById(id); };
@@ -119,7 +124,7 @@ function start() {
   map.attributionControl.setPrefix(false);
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 18,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &middot; Results: Bexar County Elections &middot; Precincts: Texas Legislative Council'
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &middot; Results: Bexar County Elections &middot; Precincts: Texas Legislative Council, VEST'
   }).addTo(map);
 
   var DATA = null, year = null, race = "all";
@@ -222,7 +227,8 @@ function start() {
         var rc = f.properties.races[0], v = rc.precincts[f.properties.p], t = total(v);
         if (!t) return { color: "#999", weight: 0.8, opacity: 0.7, fillColor: "#bbb", fillOpacity: 0.25 };
         var lead = leader(v, rc.candidates.length);
-        return { color: "#fff", weight: 0.8, opacity: 0.9, fillColor: CAND_COLORS[lead.i] || "#888", fillOpacity: shade(lead.margin) };
+        if (lead.tie) return { color: "#fff", weight: 0.8, opacity: 0.9, fillColor: TIE, fillOpacity: 0.45 };
+        return { color: "#fff", weight: 0.8, opacity: 0.9, fillColor: CAND_COLORS[lead.i] || "#888", fillOpacity: shade(lead.margin, t) };
       },
       onEachFeature: function (f, layer) {
         layer.bindTooltip(tipHtml(f.properties.p, f.properties.races), { sticky: true, className: "sd-tip", direction: "top", opacity: 1 });
@@ -263,12 +269,12 @@ function start() {
           '<span class="sd-sw" style="background:' + CAND_COLORS[0] + '"></span>Race winner<br>' +
           '<span class="sd-sw" style="background:' + CAND_COLORS[1] + '"></span>Runner-up' +
           (el.races.some(function (rc) { return rc.candidates.length > 2; }) ? '<br><span class="sd-sw" style="background:' + CAND_COLORS[2] + '"></span>3rd place' : "") +
-          ramp + '<div style="margin-top:4px"><span class="sd-sw" style="background:none;border:2px dashed ' + INK + ';width:14px;height:10px"></span>SAISD boundary</div>';
+          ramp + extraLegend() + '<div style="margin-top:4px"><span class="sd-sw" style="background:none;border:2px dashed ' + INK + ';width:14px;height:10px"></span>SAISD boundary</div>';
       } else {
         var rc = races[0];
         d.innerHTML = "<strong>District " + rc.district + ", " + year + "</strong><br>" + rc.candidates.map(function (c, i) {
           return '<span class="sd-sw" style="background:' + CAND_COLORS[i] + '"></span>' + esc(c);
-        }).join("<br>") + ramp;
+        }).join("<br>") + ramp + extraLegend();
       }
       return d;
     };
@@ -277,12 +283,16 @@ function start() {
     renderCard(el, races);
   }
 
+  function extraLegend() {
+    return '<div style="margin-top:4px;font-size:11.5px"><span class="sd-sw" style="background:' + TIE + ';opacity:.6"></span>Tie' +
+      ' &nbsp;&middot;&nbsp; fainter = under ' + FEW_VOTES + " votes</div>";
+  }
   function total(v) { var t = 0; for (var i = 0; i < v.length - 2; i++) t += v[i]; return t; }
   function leader(v, n) {
     var best = -1, bi = 0, second = -1;
     for (var i = 0; i < n; i++) { if (v[i] > best) { second = best; best = v[i]; bi = i; } else if (v[i] > second) second = v[i]; }
     var t = total(v);
-    return { i: bi, margin: t ? (best - Math.max(second, 0)) / t : 0 };
+    return { i: bi, tie: best === second, margin: t ? (best - Math.max(second, 0)) / t : 0 };
   }
 
   function tipHtml(p, list) {
@@ -312,9 +322,12 @@ function start() {
     }).join("");
     var notes = [];
     notes.push(fmtDate(el.date) + " &middot; official results: <a href=\"" + el.source + '" target="_blank" rel="noopener">Bexar County Elections</a>.');
-    if (el.year < 2021) notes.push("Precinct shapes are from 2020 (the oldest published); " + el.year + " boundaries were nearly identical.");
+    if (el.uncontested && el.uncontested.length) notes.push("Also up this year but unopposed (no election held): District " + el.uncontested.join(" and ") + ".");
+    notes.push(el.year < 2023
+      ? "Trustee districts as drawn before SAISD&rsquo;s 2022 redistricting."
+      : "Trustee districts as redrawn by SAISD in 2022.");
     if (el.unmapped.length) notes.push("Not on the map (no published boundary): precinct " + el.unmapped.join(", ") + " &mdash; its votes are included in the totals.");
-    notes.push("District outlines are approximate: they&rsquo;re drawn from the precincts that voted in each race.");
+    notes.push("Precincts are drawn with the boundaries in use at that election, clipped to the SAISD line; district outlines are approximate (built from the precincts that voted in each race).");
     card.innerHTML = '<div class="sd-races">' + boxes + "</div><div class=\"sd-note\">" + notes.join(" ") + "</div>";
     if (race === "all") {
       Array.prototype.forEach.call(card.querySelectorAll(".sd-race.clickable"), function (b) {
