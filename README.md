@@ -40,6 +40,25 @@ Three tools, shown as tabs. Choose which appear with `data-mode` on the embed di
 - **Polling place finder.** Shows the closest early-voting site (with that site's hours; branch sites are weekday-only) and, once published, the closest Election Day site. Includes a Google Maps directions link. Bexar County uses countywide vote centers, and the UI says so.
 - Precinct hover tooltips with registered/active voter counts.
 
+## SAISD board elections page (`/SAISD/`)
+
+**https://hamzsait.github.io/bexar-map/SAISD/** shows San Antonio ISD trustee results by voting precinct for the May 2017, 2019, 2021, 2023 and 2025 elections. Pick a year and either "All races" or a single district. Precincts are colored by the leading candidate, and darker means a bigger margin. Hover or tap a precinct for its vote counts. Links work per view, e.g. `/SAISD/#2021-d7`.
+
+| File | What |
+|------|------|
+| `SAISD/index.html` | The page |
+| `SAISD/saisd.js` | The widget (embeddable: `<div id="saisd-root"></div><script src="https://hamzsait.github.io/bexar-map/SAISD/saisd.js"></script>`; optional `data-year`, `data-title`, `data-header="off"`) |
+| `SAISD/saisd-data.json` | Results + precinct shapes, built by `python3 scripts/build-saisd.py` |
+
+Sources and caveats:
+
+- **Results:** Bexar County Elections official precinct reports, parsed from the HTML (2017, 2019), PDF (2021, 2023) and CSV (2025) versions. Candidate totals match the county's official summary reports exactly.
+- **Precinct shapes:** Texas Legislative Council VTD shapefiles. 2021 uses the 2020 file, 2023 uses 2022, and 2025 uses 2024.
+  - 2017 and 2019 also use the 2020 shapes, since no older file is published. Bexar didn't redraw precincts until late 2021.
+  - Precinct 3206 (2021, 35 votes) has no published boundary. Its votes count in the totals but it isn't drawn.
+- **District outlines** are the union of the precincts that voted in each race, because SAISD doesn't publish its trustee districts as GIS data. They're approximate where a precinct is split between districts.
+- **SAISD boundary:** Census TIGERweb.
+
 ## Embed in Squarespace
 
 Push this folder to a public GitHub repo named `bexar-map` under `hamzsait` and enable GitHub Pages (main branch, root). Then paste into a Code Block:
