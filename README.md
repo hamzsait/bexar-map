@@ -49,6 +49,7 @@ Three tools, shown as tabs. Choose which appear with `data-mode` on the embed di
 | `SAISD/index.html` | The page |
 | `SAISD/saisd.js` | The widget (embeddable: `<div id="saisd-root"></div><script src="https://hamzsait.github.io/bexar-map/SAISD/saisd.js"></script>`; optional `data-year`, `data-title`, `data-header="off"`) |
 | `SAISD/saisd-data.json` | Results + precinct shapes, built by `python3 scripts/build-saisd.py` |
+| `SAISD/saisd-rolloff.json` | Data for the "How many voters skip the school board race?" chart under the map. It's the share of ballots left blank for mayor, city council and SAISD trustee in SAISD precincts, per election. Rebuild with `scripts/saisd-rolloff/parse_contests.py` → `build_rolloff.py` → `export_json.py` (same cached county reports) |
 
 Sources and caveats:
 
